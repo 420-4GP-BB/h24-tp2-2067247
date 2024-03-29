@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -19,14 +20,14 @@ public class ControlleurJeu : MonoBehaviour
     private int qtOeuf;
     private int qtChoux=0;
     private int qtGraines;
-    float deltaMinutes = 0;
-    int heure1 = 8;
     int jour1 = 1;
+    TimeSpan time = new TimeSpan(8, 0, 0);
     // Start is called before the first frame update
     void Start()
     {
         nomJoueur.text = Parametres.Instance.Nom;
         IntialiserInventaire();
+        
     }
 
     // Update is called once per frame
@@ -34,23 +35,33 @@ public class ControlleurJeu : MonoBehaviour
     {
         if (soleil != null)
         {
-            deltaMinutes += soleil.DeltaMinutesEcoulees;
-          //  Debug.Log($"Delta Minutes Ecoulees: {deltaMinutes}");
-            if (deltaMinutes >= 59)
+           time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
+            heure.text = time.ToString(@"hh\:mm");
+            if (time.TotalHours >= 24)
             {
-                heure1 += 1;
-                deltaMinutes =0;
-            }
-            if(heure1>=23 && deltaMinutes >= 59)
-            {
-                jour1 += 1;
-                heure1 = 0;
-                deltaMinutes = 0;
+                jour1 += 1; 
+                time = time.Subtract(new TimeSpan(24, 0, 0)); 
             }
             jour.text = $"Jour {jour1}";
-            heure.text = $"{heure1}:{((int)deltaMinutes)}";
-            Debug.Log($"Heures Écoulées : {heure1} Minutes Ecoulees: {deltaMinutes}");
+            
         }
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            Time.timeScale = 45;
+        }
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            Time.timeScale = 1;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            Time.timeScale = 0;
+        }
+        if (Input.GetKeyUp(KeyCode.Alpha0))
+        {
+            Time.timeScale = 1;
+        }
+
     }
 
     private void IntialiserInventaire()

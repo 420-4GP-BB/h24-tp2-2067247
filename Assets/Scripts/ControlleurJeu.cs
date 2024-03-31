@@ -15,35 +15,39 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text nombreChoux;
     [SerializeField] private TMP_Text nombreGraines;
     [SerializeField] private Soleil soleil;
-    
+
     private int qtOr;
     private int qtOeuf;
-    private int qtChoux=0;
+    private int qtChoux = 0;
     private int qtGraines;
     int jour1 = 1;
+    private float ValeurEnergie = 100;
     TimeSpan time = new TimeSpan(8, 0, 0);
     // Start is called before the first frame update
     void Start()
     {
+        energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
         IntialiserInventaire();
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        ValeurEnergie -= ConstantesJeu.COUT_IMMOBILE*100;
+        energie.text = ((int)ValeurEnergie) + " %";
         if (soleil != null)
         {
-           time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
+            time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
             heure.text = time.ToString(@"hh\:mm");
             if (time.TotalHours >= 24)
             {
-                jour1 += 1; 
-                time = time.Subtract(new TimeSpan(24, 0, 0)); 
+                jour1 += 1;
+                time = time.Subtract(new TimeSpan(24, 0, 0));
             }
             jour.text = $"Jour {jour1}";
-            
+
         }
         if (Input.GetKeyDown(KeyCode.Tab))
         {

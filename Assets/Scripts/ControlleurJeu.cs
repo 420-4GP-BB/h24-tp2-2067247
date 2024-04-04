@@ -35,7 +35,7 @@ public class ControlleurJeu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ValeurEnergie -= ConstantesJeu.COUT_IMMOBILE*100;
+        ValeurEnergie -= ConstantesJeu.COUT_IMMOBILE*100*soleil.DeltaMinutesEcoulees;
         energie.text = ((int)ValeurEnergie) + " %";
         if (soleil != null)
         {

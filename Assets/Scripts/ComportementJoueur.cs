@@ -8,8 +8,8 @@ public class ComportementJoueur : MonoBehaviour
     private CharacterController _controller;
     private Transform _transform;
 
-    public float speed = 30.0f; // Vitesse de déplacement du joueur
-    public float rotationSpeed = 120.0f;
+   private float vitesse = 7.0f; 
+    private float rotationSpeed = 120.0f;
 
     
     void Start()
@@ -30,7 +30,8 @@ public class ComportementJoueur : MonoBehaviour
         //  mouvement avant et arrière du joueur avec W et S ou les flèches haut et bas
         float vertical = Input.GetAxis("Vertical");
         Vector3 move = transform.forward * vertical;
-        _controller.SimpleMove(move * speed);
+        Debug.Log($"Speed: {vitesse}");
+        _controller.SimpleMove(move * vitesse);
 
         // Vérifier si le joueur se déplace pour déclencher l'animation de marche
         if (vertical != 0)

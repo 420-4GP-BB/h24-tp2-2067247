@@ -8,10 +8,10 @@ public class ComportementJoueur : MonoBehaviour
     private CharacterController _controller;
     private Transform _transform;
 
-    public float speed = 5.0f; // Vitesse de déplacement du joueur
+    public float speed = 30.0f; // Vitesse de déplacement du joueur
     public float rotationSpeed = 120.0f;
 
-    // Start est appelé avant la première mise à jour de la frame
+    
     void Start()
     {
         _animator = GetComponent<Animator>();
@@ -20,7 +20,7 @@ public class ComportementJoueur : MonoBehaviour
         _transform.position = new Vector3(_transform.position.x, 0f, _transform.position.z);
     }
 
-    // Update est appelé une fois par frame
+
     void Update()
     {
         // rotation du joueur avec les flèches gauche et droite

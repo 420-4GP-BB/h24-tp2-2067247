@@ -15,6 +15,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text nombreChoux;
     [SerializeField] private TMP_Text nombreGraines;
     [SerializeField] private Soleil soleil;
+    [SerializeField] private GameObject panelMenu;
 
     private int qtOr;
     private int qtOeuf;
@@ -26,6 +27,7 @@ public class ControlleurJeu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        panelMenu.SetActive(false);
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
         IntialiserInventaire();
@@ -60,10 +62,12 @@ public class ControlleurJeu : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             Time.timeScale = 0;
+            panelMenu.SetActive(true);
         }
         if (Input.GetKeyUp(KeyCode.Alpha0))
         {
             Time.timeScale = 1;
+            panelMenu.SetActive(false);
         }
 
     }

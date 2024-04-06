@@ -15,7 +15,7 @@ public class MouvementPoules : MonoBehaviour
     {
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
-        
+        _agent.speed = 1;
         DirigerPoule();
 
 
@@ -39,5 +39,6 @@ public class MouvementPoules : MonoBehaviour
         // Selectionne un point au hazard
         _indexPatrouille = Random.Range(0, _pointsdestination.Length);
         _agent.destination = _pointsdestination[_indexPatrouille].position;
+        
     }
 }

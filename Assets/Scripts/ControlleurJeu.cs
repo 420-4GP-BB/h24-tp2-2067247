@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ControlleurJeu : MonoBehaviour
 {
@@ -16,6 +17,13 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text nombreGraines;
     [SerializeField] private Soleil soleil;
     [SerializeField] private GameObject panelMenu;
+    [SerializeField] private GameObject Poule;
+    [SerializeField] private GameObject BoutonAcheterOeufs;
+    [SerializeField] private GameObject BoutonAcheterPoule;
+    [SerializeField] private GameObject BoutonAcheterGraines;
+    [SerializeField] private GameObject BoutonVendreChoux;
+    
+
 
     private int qtOr;
     private int qtOeuf;
@@ -27,6 +35,7 @@ public class ControlleurJeu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Poule.SetActive(false);
         panelMenu.SetActive(false);
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
@@ -64,12 +73,41 @@ public class ControlleurJeu : MonoBehaviour
             Time.timeScale = 0;
             panelMenu.SetActive(true);
         }
-        if (Input.GetKeyUp(KeyCode.Alpha0))
-        {
-            Time.timeScale = 1;
-            panelMenu.SetActive(false);
-        }
+        //Les boutons sont cliquables seulement si le joueur a assez de ressources.
+        BoutonAcheterOeufs.GetComponent<Button>().interactable = qtOr >= 25;
+        BoutonAcheterPoule.GetComponent<Button>().interactable = qtOr >= 100;
+        BoutonAcheterGraines.GetComponent<Button>().interactable = qtOr >= 3;
+        BoutonVendreChoux.GetComponent<Button>().interactable = qtChoux >= 1;
 
+
+    }
+    public void AcheterPoulet()
+    {
+        effectuerPaiement(100);
+        if (Poule.active)
+        {
+            GameObject.Instantiate(Poule);
+        }
+        else { Poule.SetActive(true); }
+
+    }
+    public void AcheterOeuf()
+    {
+        effectuerPaiement(25);
+        AquerirUnOeuf();
+
+
+    }
+    public void AcheterGraines()
+    {
+        effectuerPaiement(3);
+        qtGraines += 1;
+        nombreGraines.text = qtGraines.ToString();
+    }
+    public void sortirMenu()
+    {
+        Time.timeScale = 1;
+        panelMenu.SetActive(false);
     }
 
     private void IntialiserInventaire()
@@ -99,4 +137,20 @@ public class ControlleurJeu : MonoBehaviour
         nombreGraines.text = qtGraines.ToString();
 
     }
+    private void effectuerPaiement(int montant)
+    {
+        qtOr -= montant;
+        nombreOr.text = qtOr.ToString();
+    }
+    private void AquerirUnOeuf()
+    {
+        qtOeuf += 1;
+        nombreOeuf.text = qtOeuf.ToString();
+    }
+    private void AquerirUnChoux()
+    {
+        qtChoux += 1;
+        nombreChoux.text = qtChoux.ToString();
+    }
+
 }

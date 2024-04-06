@@ -22,7 +22,8 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private GameObject BoutonAcheterPoule;
     [SerializeField] private GameObject BoutonAcheterGraines;
     [SerializeField] private GameObject BoutonVendreChoux;
-    
+    [SerializeField] private MagasinSujet EntreeMagasin;
+
 
 
     private int qtOr;
@@ -40,6 +41,7 @@ public class ControlleurJeu : MonoBehaviour
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
         IntialiserInventaire();
+        EntreeMagasin.ZoneAtteinteHandler += ActiverMenu;
 
     }
 
@@ -68,11 +70,7 @@ public class ControlleurJeu : MonoBehaviour
         {
             Time.timeScale = 1;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            Time.timeScale = 0;
-            panelMenu.SetActive(true);
-        }
+        
         //Les boutons sont cliquables seulement si le joueur a assez de ressources.
         BoutonAcheterOeufs.GetComponent<Button>().interactable = qtOr >= 25;
         BoutonAcheterPoule.GetComponent<Button>().interactable = qtOr >= 100;
@@ -151,6 +149,17 @@ public class ControlleurJeu : MonoBehaviour
     {
         qtChoux += 1;
         nombreChoux.text = qtChoux.ToString();
+    }
+    public void ActiverMenu(object sender, EventArgs e)
+    {
+        if (sender == EntreeMagasin )
+        {
+            Time.timeScale = 0;
+            panelMenu.SetActive(true);
+
+
+
+        }
     }
 
 }

@@ -55,6 +55,15 @@ public class ComportementJoueur : MonoBehaviour
         {
             _animator.SetBool("Pickup", true);
         }
-        
+        //code de triche pour teleporter le joueur devant le magasin
+        if (Input.GetKeyUp(KeyCode.Alpha1))
+        {
+            _transform.position= new Vector3(-38.22f, 0, -14.68f);
+        }
+        //code de triche pour teleporter le joueur devant la ferme
+        if (Input.GetKeyUp(KeyCode.Alpha2))
+        {
+            _transform.position = new Vector3(-58f, 0, -52f);
+        }
     }
 }

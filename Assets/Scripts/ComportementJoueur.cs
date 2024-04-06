@@ -30,7 +30,6 @@ public class ComportementJoueur : MonoBehaviour
         //  mouvement avant et arrière du joueur avec W et S ou les flèches haut et bas
         float vertical = Input.GetAxis("Vertical");
         Vector3 move = transform.forward * vertical;
-        Debug.Log($"Speed: {vitesse}");
         _controller.SimpleMove(move * vitesse);
 
         // Vérifier si le joueur se déplace pour déclencher l'animation de marche

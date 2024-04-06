@@ -70,7 +70,8 @@ public class ControlleurJeu : MonoBehaviour
         {
             Time.timeScale = 1;
         }
-        
+       
+
         //Les boutons sont cliquables seulement si le joueur a assez de ressources.
         BoutonAcheterOeufs.GetComponent<Button>().interactable = qtOr >= 25;
         BoutonAcheterPoule.GetComponent<Button>().interactable = qtOr >= 100;
@@ -160,6 +161,10 @@ public class ControlleurJeu : MonoBehaviour
 
 
         }
+    }
+    public  TimeSpan GetTime()
+    {
+        return time;
     }
 
 }

@@ -17,7 +17,7 @@ public class ComportementJoueur : MonoBehaviour
         _animator = GetComponent<Animator>();
         _controller = GetComponent<CharacterController>();
         _transform = GetComponent<Transform>();
-        _transform.position = new Vector3(_transform.position.x, 0f, _transform.position.z);
+       
     }
 
 
@@ -63,7 +63,7 @@ public class ComportementJoueur : MonoBehaviour
         //code de triche pour teleporter le joueur devant la ferme
         if (Input.GetKeyUp(KeyCode.Alpha2))
         {
-            _transform.position = new Vector3(-58f, 0, -52f);
+            _transform.position = new Vector3(58.5f, 0, -52f);
         }
     }
 }

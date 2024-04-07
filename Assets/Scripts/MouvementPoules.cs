@@ -10,11 +10,14 @@ public class MouvementPoules : MonoBehaviour
 {
     [SerializeField] private Transform[] _pointsdestination;
     [SerializeField] private GameObject gameManager;
+    [SerializeField] private GameObject Oeuf;
     private NavMeshAgent _agent;
     private int _indexPatrouille;
     private Animator _animator;
     private ControlleurJeu controlleurJeu;
     private bool pondre=false;
+    private bool pondreOeuf = false;
+    private TimeSpan tempsPonte;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +26,7 @@ public class MouvementPoules : MonoBehaviour
         controlleurJeu = gameManager.GetComponent<ControlleurJeu>();
         _agent.speed = 1;
         DirigerPoule();
+       // Oeuf.SetActive(false);
 
 
     }
@@ -35,7 +39,7 @@ public class MouvementPoules : MonoBehaviour
             _animator.SetBool("Walk", false);
             DirigerPoule();
         }
-        if (controlleurJeu.GetTime().TotalHours>23)
+        if (controlleurJeu.GetTime().Hours==23 && controlleurJeu.GetTime().Minutes >= 59)
         {
             int nombre = Random.Range(0, 2);
             if (nombre == 0){
@@ -45,19 +49,17 @@ public class MouvementPoules : MonoBehaviour
         }
         if (pondre)
         {
+            pondreOeuf = true;
             pondre = false;
-            // Generer une heure au hazard entre 0 et 23
-            int heure = Random.Range(0, 24);
-
-            // Generer une minute au hazard entre 0 et 59
-            int minute = Random.Range(0, 60);
-
-            // Creer un timespan pour representer le moment 
-            TimeSpan momentPonte = new TimeSpan(heure, minute, 0);
-
-           
-            Debug.Log("Random Time: " + momentPonte.ToString(@"hh\:mm"));
-
+            tempsPonte= GenererHeureRandom();
+            Debug.Log("Temps de ponte: " + tempsPonte);
+            
+        }
+        if (pondreOeuf)
+        {
+          //  pondreOeuf = false;
+            genererOeuf(tempsPonte);
+            
         }
     }
 
@@ -70,5 +72,38 @@ public class MouvementPoules : MonoBehaviour
         _indexPatrouille = Random.Range(0, _pointsdestination.Length);
         _agent.destination = _pointsdestination[_indexPatrouille].position;
         
+    }
+    private TimeSpan GenererHeureRandom()
+    {
+       
+        // Generer une heure au hazard entre 0 et 23
+        int heure = Random.Range(0, 24);
+
+        // Generer une minute au hazard entre 0 et 59
+        int minute = Random.Range(0, 60);
+
+        // Creer un timespan pour representer le moment 
+        TimeSpan momentPonte = new TimeSpan(heure, minute, 0);
+        pondreOeuf = true;
+        return momentPonte;
+        
+    }
+    private void genererOeuf(TimeSpan moment)
+    {
+        if (controlleurJeu.GetTime() >= (moment))
+        {
+            pondreOeuf = false;
+            if (!Oeuf.active)
+            {
+                Oeuf.SetActive(true);
+            }
+            else
+            {
+                GameObject.Instantiate(Oeuf);
+            }
+            Oeuf.transform.position = transform.position;
+
+        }
+     
     }
 }

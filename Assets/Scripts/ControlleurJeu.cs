@@ -23,6 +23,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private GameObject BoutonAcheterGraines;
     [SerializeField] private GameObject BoutonVendreChoux;
     [SerializeField] private MagasinSujet EntreeMagasin;
+    [SerializeField] private GameObject Oeuf;
 
 
 
@@ -37,6 +38,7 @@ public class ControlleurJeu : MonoBehaviour
     void Start()
     {
         Poule.SetActive(false);
+        Oeuf.SetActive(false);
         panelMenu.SetActive(false);
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;

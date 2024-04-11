@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private GameObject BoutonVendreChoux;
     [SerializeField] private MagasinSujet EntreeMagasin;
     [SerializeField] private GameObject Oeuf;
+    [SerializeField] private GameObject Joueur;
 
 
 
@@ -81,7 +83,17 @@ public class ControlleurJeu : MonoBehaviour
         BoutonVendreChoux.GetComponent<Button>().interactable = qtChoux >= 1;
 
 
-    }
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("helloooooow");
+            UnityEngine.Vector3? pointClique = Utilitaires.DeterminerClic(Oeuf.GetComponent<Collider>());
+            if (pointClique != null)
+            {
+                Joueur.GetComponent<ComportementJoueur>().dirigerAgentJoueur((UnityEngine.Vector3)pointClique);
+            }
+        }
+
+        }
     public void AcheterPoulet()
     {
         effectuerPaiement(100);

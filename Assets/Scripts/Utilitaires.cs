@@ -1,13 +1,12 @@
-using System.Collections;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Utilitaires
 {
-    public static IEnumerator neRienFaire()
-    {
-        yield return null;
-    }
-
     public static Vector3? DeterminerClic(Collider colliderCible)
     {
         Vector3 positionSouris = Input.mousePosition;
@@ -23,7 +22,8 @@ public class Utilitaires
             if (hit.collider == colliderCible)
             {
                 // Le vecteur est initialise ici car le clic est sur le plan
-                pointClique = hit.point;
+                Vector3 position = hit.point;
+                pointClique = new Vector3(position.x, position.y, position.z);
             }
         }
         return pointClique;

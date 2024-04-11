@@ -1,19 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class ComportementJoueur : MonoBehaviour
 {
     private Animator _animator;
     private CharacterController _controller;
     private Transform _transform;
-
-   private float vitesse = 7.0f; 
+    private NavMeshAgent _agent;
+    private float vitesse = 7.0f; 
     private float rotationSpeed = 120.0f;
 
     
     void Start()
     {
+        _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _controller = GetComponent<CharacterController>();
         _transform = GetComponent<Transform>();
@@ -65,5 +67,16 @@ public class ComportementJoueur : MonoBehaviour
         {
             _transform.position = new Vector3(58.5f, 0, -52f);
         }
+    }
+    public void dirigerAgentJoueur(Vector3 destination)
+    {
+        _controller.enabled = false;
+        _animator.SetBool("Walk", true);
+        _agent.destination=destination;
+        if(!_agent.pathPending && _agent.remainingDistance < 0.1f)
+        {
+            _animator.SetBool("Walk",false);
+        }
+        _controller.enabled = true;
     }
 }

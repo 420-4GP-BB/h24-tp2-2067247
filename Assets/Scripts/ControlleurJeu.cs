@@ -90,7 +90,7 @@ public class ControlleurJeu : MonoBehaviour
         {
            
             GameObject objet =  Utilitaires.DeterminerClic("Oeuf");
-          
+            GameObject chouVide = Utilitaires.DeterminerClic("Chou");
 
 
             if (objet != null)
@@ -99,8 +99,12 @@ public class ControlleurJeu : MonoBehaviour
                AquerirUnOeuf();
                objet.SetActive(false);
 
-               
               
+            }
+            if (chouVide!= null)
+            {
+                GameObject child = chouVide.transform.Find("Petit").gameObject;
+                child.SetActive(true);
             }
         }
 

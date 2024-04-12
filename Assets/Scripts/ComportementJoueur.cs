@@ -11,8 +11,10 @@ public class ComportementJoueur : MonoBehaviour
     private NavMeshAgent _agent;
     private float vitesse = 7.0f; 
     private float rotationSpeed = 120.0f;
+    [SerializeField] private Transform magasin;
+    [SerializeField] private Transform maison;
 
-    
+
     void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
@@ -60,16 +62,18 @@ public class ComportementJoueur : MonoBehaviour
         //code de triche pour teleporter le joueur devant le magasin
         if (Input.GetKeyUp(KeyCode.Alpha1))
         {
-            _transform.position= new Vector3(-38.22f, 0, -14.68f);
+            _transform.localPosition = magasin.position;
         }
         //code de triche pour teleporter le joueur devant la ferme
         if (Input.GetKeyUp(KeyCode.Alpha2))
         {
-            _transform.position = new Vector3(58.5f, 0, -52f);
+            _transform.localPosition = maison.position;
+            
         }
     }
     public void dirigerAgentJoueur(Vector3 destination)
     {
+        _agent.enabled = true;
         _controller.enabled = false;
         _animator.SetBool("Walk", true);
         _agent.destination=destination;
@@ -78,5 +82,6 @@ public class ComportementJoueur : MonoBehaviour
             _animator.SetBool("Walk",false);
         }
         _controller.enabled = true;
+        _agent.enabled = false;
     }
 }

@@ -10,7 +10,6 @@ public class MouvementPoules : MonoBehaviour
 {
     [SerializeField] private Transform[] _pointsdestination;
     [SerializeField] private GameObject gameManager;
-    [SerializeField] private GameObject Oeuf;
     private NavMeshAgent _agent;
     private int _indexPatrouille;
     private Animator _animator;
@@ -38,6 +37,7 @@ public class MouvementPoules : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (!_agent.pathPending && _agent.remainingDistance < 0.2f)
         {
             _animator.SetBool("Walk", false);
@@ -80,7 +80,8 @@ public class MouvementPoules : MonoBehaviour
         }
         if (controlleurJeu.GetTime().Hours == heurePonte && controlleurJeu.GetTime().Minutes >= minPonte && pondreOeuf)
         {
-            genererOeuf();
+            Debug.Log("Oeuf Pondu");
+            controlleurJeu.PondreOeuf(transform.position);
             pondreOeuf = false;
         }
             
@@ -112,7 +113,7 @@ public class MouvementPoules : MonoBehaviour
         return momentPonte;
 
     }
-    private void genererOeuf()
+    /*private void genererOeuf()
     {
         Debug.Log("Generation d'oeuf ");
 
@@ -133,5 +134,5 @@ public class MouvementPoules : MonoBehaviour
 
 
 
-    }
+    }*/
 }

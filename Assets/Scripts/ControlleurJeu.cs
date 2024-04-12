@@ -5,6 +5,7 @@ using System.Numerics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Vector3 = UnityEngine.Vector3;
 
 public class ControlleurJeu : MonoBehaviour
 {
@@ -24,11 +25,11 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private GameObject BoutonAcheterGraines;
     [SerializeField] private GameObject BoutonVendreChoux;
     [SerializeField] private MagasinSujet EntreeMagasin;
-    [SerializeField] private GameObject Oeuf;
+    [SerializeField] public GameObject Oeuf;
     [SerializeField] private GameObject Joueur;
 
 
-
+   
     private int qtOr;
     private int qtOeuf;
     private int qtChoux = 0;
@@ -39,6 +40,7 @@ public class ControlleurJeu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         Poule.SetActive(false);
         Oeuf.SetActive(false);
         panelMenu.SetActive(false);
@@ -74,7 +76,8 @@ public class ControlleurJeu : MonoBehaviour
         {
             Time.timeScale = 1;
         }
-       
+
+      
 
         //Les boutons sont cliquables seulement si le joueur a assez de ressources.
         BoutonAcheterOeufs.GetComponent<Button>().interactable = qtOr >= 25;
@@ -85,11 +88,19 @@ public class ControlleurJeu : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("helloooooow");
-            UnityEngine.Vector3? pointClique = Utilitaires.DeterminerClic(Oeuf.GetComponent<Collider>());
-            if (pointClique != null)
+           
+            GameObject objet =  Utilitaires.DeterminerClic("Oeuf");
+          
+
+
+            if (objet != null)
             {
-                Joueur.GetComponent<ComportementJoueur>().dirigerAgentJoueur((UnityEngine.Vector3)pointClique);
+      
+               AquerirUnOeuf();
+               objet.SetActive(false);
+
+               
+              
             }
         }
 
@@ -102,6 +113,17 @@ public class ControlleurJeu : MonoBehaviour
             GameObject.Instantiate(Poule);
         }
         else { Poule.SetActive(true); }
+
+    }
+    public void PondreOeuf(Vector3 position)
+    {
+       
+        if (Oeuf.active)
+        {
+            GameObject.Instantiate(Oeuf);
+        }
+        else { Oeuf.SetActive(true); }
+        Oeuf.transform.position = position;
 
     }
     public void AcheterOeuf()

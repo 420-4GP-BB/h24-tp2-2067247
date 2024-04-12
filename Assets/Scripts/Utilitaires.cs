@@ -7,10 +7,13 @@ using UnityEngine;
 
 public class Utilitaires
 {
-    public static Vector3? DeterminerClic(Collider colliderCible)
+    
+
+    public static GameObject DeterminerClic(string tag)
     {
         Vector3 positionSouris = Input.mousePosition;
-        Vector3? pointClique = null;
+   
+        GameObject clickedObject=null;
 
         // Trouver le lien avec la caméra
         Ray ray = Camera.main.ScreenPointToRay(positionSouris);
@@ -18,15 +21,18 @@ public class Utilitaires
 
         if (Physics.Raycast(ray, out hit))
         {
-            // Vérifier si l'objet touché est le plan.
-            if (hit.collider == colliderCible)
+            // Vérifier quel objet est touché.
+            if (hit.collider.tag == tag)
             {
-                // Le vecteur est initialise ici car le clic est sur le plan
-                Vector3 position = hit.point;
-                pointClique = new Vector3(position.x, position.y, position.z);
+                clickedObject = hit.collider.gameObject;
+
+            }
+            else
+            {
+                Debug.Log("L'objet cliqué est un "+ hit.collider.gameObject.name);
             }
         }
-        return pointClique;
+        return clickedObject;
     }
 }
 

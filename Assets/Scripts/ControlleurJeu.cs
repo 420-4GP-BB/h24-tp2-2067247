@@ -91,6 +91,7 @@ public class ControlleurJeu : MonoBehaviour
            
             GameObject objet =  Utilitaires.DeterminerClic("Oeuf");
             GameObject chouVide = Utilitaires.DeterminerClic("Chou");
+            GameObject ChouPret = Utilitaires.DeterminerClic("ChouPret");
 
 
             if (objet != null)
@@ -101,28 +102,50 @@ public class ControlleurJeu : MonoBehaviour
 
               
             }
-            if (chouVide!= null)
+            if (chouVide != null)
             {
-                GameObject child = chouVide.transform.Find("Petit").gameObject;
-                child.SetActive(true);
+                if(VerifierChouVide(chouVide) && qtGraines > 0)
+
+                {
+                    GameObject child = chouVide.transform.Find("Petit").gameObject;
+                    child.SetActive(true);
+                    PlanterUnChoux();
+                }
+
+                
+            }
+            if (ChouPret!= null)
+            {
+                Debug.Log("le chou EST PRET");
+                
+                GameObject parentObject = ChouPret.transform.parent.gameObject;
+                parentObject.SetActive(false);
+                CueillirUnChoux();
             }
         }
+            
+            
+            
 
         }
+    /// <summary>
+    /// Achat de poule
+    /// </summary>
     public void AcheterPoulet()
     {
         effectuerPaiement(100);
-        if (Poule.active)
+        if (Poule.activeSelf)
         {
             GameObject.Instantiate(Poule);
         }
         else { Poule.SetActive(true); }
 
     }
+    //ponte des oeuf
     public void PondreOeuf(Vector3 position)
     {
        
-        if (Oeuf.active)
+        if (Oeuf.activeSelf)
         {
             GameObject.Instantiate(Oeuf);
         }
@@ -130,6 +153,9 @@ public class ControlleurJeu : MonoBehaviour
         Oeuf.transform.position = position;
 
     }
+    /// <summary>
+    /// Achat d'oeuf
+    /// </summary>
     public void AcheterOeuf()
     {
         effectuerPaiement(25);
@@ -137,18 +163,26 @@ public class ControlleurJeu : MonoBehaviour
 
 
     }
+    /// <summary>
+    /// Achat de graines
+    /// </summary>
     public void AcheterGraines()
     {
         effectuerPaiement(3);
         qtGraines += 1;
         nombreGraines.text = qtGraines.ToString();
     }
+    /// <summary>
+    /// sortie du menu
+    /// </summary>
     public void sortirMenu()
     {
         Time.timeScale = 1;
         panelMenu.SetActive(false);
     }
-
+    /// <summary>
+    /// methode pour initialiser l'inventaire dapres les valeur stockées dans le singleton
+    /// </summary>
     private void IntialiserInventaire()
     {
         nombreChoux.text = qtChoux.ToString();
@@ -176,21 +210,44 @@ public class ControlleurJeu : MonoBehaviour
         nombreGraines.text = qtGraines.ToString();
 
     }
+    /// <summary>
+    /// Methode pour actualiser Valeur lorsqu'on effectue un paiement
+    /// </summary>
     private void effectuerPaiement(int montant)
     {
         qtOr -= montant;
         nombreOr.text = qtOr.ToString();
     }
+    /// <summary>
+    /// Methode pour actualiser Valeur lorsqu'on rammasse un oeuf
+    /// </summary>
     private void AquerirUnOeuf()
     {
         qtOeuf += 1;
         nombreOeuf.text = qtOeuf.ToString();
     }
-    private void AquerirUnChoux()
+    /// <summary>
+    /// Methode pour actualiser Valeur lorsqu'on cueille un chou
+    /// </summary>
+    private void CueillirUnChoux()
     {
-        qtChoux += 1;
+        qtChoux -= 1;
         nombreChoux.text = qtChoux.ToString();
     }
+    /// <summary>
+    /// Methode pour actualiser Valeur lorsqu'on plante un chou
+    /// </summary>
+    private void PlanterUnChoux()
+    {
+
+        qtGraines -= 1;
+        nombreGraines.text = qtGraines.ToString();
+    }
+    /// <summary>
+    /// Activer le menu du magasin
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public void ActiverMenu(object sender, EventArgs e)
     {
         if (sender == EntreeMagasin )
@@ -202,9 +259,33 @@ public class ControlleurJeu : MonoBehaviour
 
         }
     }
+    /// <summary>
+    /// donne le temps actuel pour les autres classes
+    /// </summary>
+    /// <returns> return the temps de heu</returns>
     public  TimeSpan GetTime()
     {
         return time;
     }
+    /// <summary>
+    /// Pour verifier que les choux sont "inactifs", pour ne pas planter plus que un chou par endroit 
+    /// </summary>
+    /// <param name="chou">prend un gameobject chou</param>
+    /// <returns></returns>
+    public bool VerifierChouVide(GameObject chou)
+    {
+        foreach (Transform child in chou.transform)
+        {
+            if (child.gameObject.activeSelf)  // Verifie si le child est actif
+            {
+                // si oui return false
+                return false;
+            }
+        }
+        // si non retourne true
+        return true;
+    }
+
+    
 
 }

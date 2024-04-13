@@ -17,6 +17,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text nombreOeuf;
     [SerializeField] private TMP_Text nombreChoux;
     [SerializeField] private TMP_Text nombreGraines;
+    [SerializeField] private TMP_Text MsgBienvenue;
     [SerializeField] private Soleil soleil;
     [SerializeField] private GameObject panelMenu;
     [SerializeField] private GameObject panelMenuMaison;
@@ -34,7 +35,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private GameObject Joueur;
 
 
-   
+    private bool menuActif = false;
     private int qtOr;
     private int qtOeuf;
     private int qtChoux = 0;
@@ -53,6 +54,8 @@ public class ControlleurJeu : MonoBehaviour
         panelMenuMaison.SetActive(false);
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
+        MsgBienvenue.text= $"Bonjour {Parametres.Instance.Nom}, que puis-je faire pour toi aujourd'hui ?";
+
         IntialiserInventaire();
         EntreeMagasin.ZoneAtteinteHandler += ActiverMenu;
         EntreeMaison.ZoneAtteinteHandler += ActiverMenu;
@@ -77,14 +80,18 @@ public class ControlleurJeu : MonoBehaviour
             jour.text = $"Jour {jour1}";
 
         }
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (!menuActif)
         {
-            Time.timeScale = 45;
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                Time.timeScale = 45;
+            }
+            if (Input.GetKeyUp(KeyCode.Tab))
+            {
+                Time.timeScale = 1;
+            }
         }
-        if (Input.GetKeyUp(KeyCode.Tab))
-        {
-            Time.timeScale = 1;
-        }
+        
 
       
 
@@ -238,6 +245,12 @@ public class ControlleurJeu : MonoBehaviour
     }
     private void MangerUnOeuf()
     {
+        ValeurEnergie += ConstantesJeu.GAIN_ENERGIE_MANGER_OEUF * 100;
+        if (ValeurEnergie > 100)
+        {
+            ValeurEnergie = 100;
+        }
+        
         qtOeuf -= 1;
         nombreOeuf.text = qtOeuf.ToString();
     }
@@ -252,6 +265,11 @@ public class ControlleurJeu : MonoBehaviour
 
     private void MangerUnChoux()
     {
+        ValeurEnergie += ConstantesJeu.GAIN_ENERGIE_MANGER_CHOU * 100;
+        if (ValeurEnergie > 100)
+        {
+            ValeurEnergie = 100;
+        }
         qtChoux -= 1;
         nombreChoux.text = qtChoux.ToString();
     }
@@ -289,6 +307,7 @@ public class ControlleurJeu : MonoBehaviour
 
 
         }
+        menuActif = true;
     }
     /// <summary>
     /// donne le temps actuel pour les autres classes
@@ -340,6 +359,7 @@ public class ControlleurJeu : MonoBehaviour
     {
         Time.timeScale = 1;
         panelMenuMaison.SetActive(false);
+        menuActif = false;
     }
     public void okayManger()
     {
@@ -352,6 +372,7 @@ public class ControlleurJeu : MonoBehaviour
         {
             panelApresChoux.SetActive(false);
         }
+       
     }
 
 

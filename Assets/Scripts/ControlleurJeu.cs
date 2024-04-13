@@ -19,12 +19,17 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text nombreGraines;
     [SerializeField] private Soleil soleil;
     [SerializeField] private GameObject panelMenu;
+    [SerializeField] private GameObject panelMenuMaison;
+    [SerializeField] private GameObject panelApresOeuf;
+    [SerializeField] private GameObject panelApresChoux;
     [SerializeField] private GameObject Poule;
     [SerializeField] private GameObject BoutonAcheterOeufs;
     [SerializeField] private GameObject BoutonAcheterPoule;
     [SerializeField] private GameObject BoutonAcheterGraines;
     [SerializeField] private GameObject BoutonVendreChoux;
+    [SerializeField] private GameObject BoutonManger;
     [SerializeField] private MagasinSujet EntreeMagasin;
+    [SerializeField] private MaisonSujet EntreeMaison;
     [SerializeField] public GameObject Oeuf;
     [SerializeField] private GameObject Joueur;
 
@@ -40,14 +45,18 @@ public class ControlleurJeu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        panelApresChoux.SetActive(false);
+        panelApresOeuf.SetActive(false);
         Poule.SetActive(false);
         Oeuf.SetActive(false);
         panelMenu.SetActive(false);
+        panelMenuMaison.SetActive(false);
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
         IntialiserInventaire();
         EntreeMagasin.ZoneAtteinteHandler += ActiverMenu;
+        EntreeMaison.ZoneAtteinteHandler += ActiverMenu;
+
 
     }
 
@@ -84,6 +93,7 @@ public class ControlleurJeu : MonoBehaviour
         BoutonAcheterPoule.GetComponent<Button>().interactable = qtOr >= 100;
         BoutonAcheterGraines.GetComponent<Button>().interactable = qtOr >= 3;
         BoutonVendreChoux.GetComponent<Button>().interactable = qtChoux >= 1;
+        BoutonManger.GetComponent<Button>().interactable = VerifierManger();
 
 
         if (Input.GetMouseButtonDown(0))
@@ -190,7 +200,7 @@ public class ControlleurJeu : MonoBehaviour
         {
             qtOr = 200;
             qtOeuf = 5;
-            qtGraines = 100;
+            qtGraines = 5;
         }
         else if (Parametres.Instance.Niveau == 1)
         {
@@ -226,10 +236,21 @@ public class ControlleurJeu : MonoBehaviour
         qtOeuf += 1;
         nombreOeuf.text = qtOeuf.ToString();
     }
+    private void MangerUnOeuf()
+    {
+        qtOeuf -= 1;
+        nombreOeuf.text = qtOeuf.ToString();
+    }
     /// <summary>
     /// Methode pour actualiser Valeur lorsqu'on cueille un chou
     /// </summary>
     private void CueillirUnChoux()
+    {
+        qtChoux += 1;
+        nombreChoux.text = qtChoux.ToString();
+    }
+
+    private void MangerUnChoux()
     {
         qtChoux -= 1;
         nombreChoux.text = qtChoux.ToString();
@@ -243,6 +264,8 @@ public class ControlleurJeu : MonoBehaviour
         qtGraines -= 1;
         nombreGraines.text = qtGraines.ToString();
     }
+    
+
     /// <summary>
     /// Activer le menu du magasin
     /// </summary>
@@ -254,6 +277,14 @@ public class ControlleurJeu : MonoBehaviour
         {
             Time.timeScale = 0;
             panelMenu.SetActive(true);
+
+
+
+        }
+        if (sender == EntreeMaison)
+        {
+            Time.timeScale = 0;
+            panelMenuMaison.SetActive(true);
 
 
 
@@ -285,7 +316,44 @@ public class ControlleurJeu : MonoBehaviour
         // si non retourne true
         return true;
     }
+    private bool VerifierManger()
+    {
+        if (qtOeuf>0 || qtChoux > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    public void Manger()
+    {
+        if (qtOeuf > 0)
+        {
+            MangerUnOeuf();
+            panelApresOeuf.SetActive(true);
+        }else if(qtChoux>0)
+            {
+            MangerUnChoux();
+            panelApresChoux.SetActive(true);
+        }
+    }
+    public void SortirMaison()
+    {
+        Time.timeScale = 1;
+        panelMenuMaison.SetActive(false);
+    }
+    public void okayManger()
+    {
+        Time.timeScale = 1;
+        if (panelApresOeuf.activeSelf)
+        {
+            panelApresOeuf.SetActive(false);
+        }
+        else
+        {
+            panelApresChoux.SetActive(false);
+        }
+    }
 
-    
+
 
 }

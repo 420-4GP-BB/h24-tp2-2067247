@@ -190,7 +190,7 @@ public class ControlleurJeu : MonoBehaviour
         {
             qtOr = 200;
             qtOeuf = 5;
-            qtGraines = 5;
+            qtGraines = 100;
         }
         else if (Parametres.Instance.Niveau == 1)
         {

@@ -113,26 +113,5 @@ public class MouvementPoules : MonoBehaviour
         return momentPonte;
 
     }
-    /*private void genererOeuf()
-    {
-        Debug.Log("Generation d'oeuf ");
-
-
-
-        
-        if (!Oeuf.active)
-        {
-            Oeuf.SetActive(true);
-        }
-        else
-        {
-            Instantiate(Oeuf);
-        }
-        Oeuf.transform.position = transform.position;
-        Debug.Log("Je ponds mnt à  :" + controlleurJeu.GetTime().ToString(@"hh\:mm"));
-
-
-
-
-    }*/
+    
 }

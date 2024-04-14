@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class ComportementJoueur : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class ComportementJoueur : MonoBehaviour
     private float rotationSpeed = 120.0f;
     [SerializeField] private Transform magasin;
     [SerializeField] private Transform maison;
-
+    private EtatJoueur _etat;
+    
 
     void Start()
     {
@@ -21,67 +23,66 @@ public class ComportementJoueur : MonoBehaviour
         _animator = GetComponent<Animator>();
         _controller = GetComponent<CharacterController>();
         _transform = GetComponent<Transform>();
-       
+        ChangerEtat(new EtatIdle(this, null));
+        
     }
 
 
     void Update()
     {
-        // rotation du joueur avec les flèches gauche et droite
+        _etat.Handle();
+        GererInput();
+       
+       
+    }
+    void GererInput()
+    {
+        if (!AutoriserInput()) return;  // Prevent input if the current state disallows it
+
+        // gerer rotation
         float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
         transform.Rotate(0, rotation, 0);
 
-        //  mouvement avant et arrière du joueur avec W et S ou les flèches haut et bas
+        // gerer movement
         float vertical = Input.GetAxis("Vertical");
-        Vector3 move = transform.forward * vertical;
-        _controller.SimpleMove(move * vitesse);
-
-        // Vérifier si le joueur se déplace pour déclencher l'animation de marche
         if (vertical != 0)
         {
+            // Player has input for movement, thus move the character
+            Vector3 move = transform.forward * vertical * vitesse;
+            _controller.SimpleMove(move);
+
+            
             _animator.SetBool("Walk", true);
+            
         }
         else
         {
+          
             _animator.SetBool("Walk", false);
         }
 
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            _animator.SetBool("Plant", true);
-        }
-        if (Input.GetKeyUp(KeyCode.P))
-        {
-            _animator.SetBool("Plant", false);
-        }
-
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            _animator.SetBool("Pickup", true);
-        }
-        //code de triche pour teleporter le joueur devant le magasin
+        // Cheat codes
         if (Input.GetKeyUp(KeyCode.Alpha1))
         {
-            _transform.localPosition = magasin.position;
+            _transform.position = magasin.position;
         }
-        //code de triche pour teleporter le joueur devant la ferme
         if (Input.GetKeyUp(KeyCode.Alpha2))
         {
-            _transform.localPosition = maison.position;
-            
+            _transform.position = maison.position;
         }
     }
-    public void dirigerAgentJoueur(Vector3 destination)
+   private bool AutoriserInput()
     {
-        _agent.enabled = true;
-        _controller.enabled = false;
-        _animator.SetBool("Walk", true);
-        _agent.destination=destination;
-        if(!_agent.pathPending && _agent.remainingDistance < 0.1f)
-        {
-            _animator.SetBool("Walk",false);
-        }
-        _controller.enabled = true;
-        _agent.enabled = false;
+        
+        return _etat?.AllowInput() ?? true;
     }
+
+    public void ChangerEtat(EtatJoueur nouvelEtat)
+    {
+        _etat?.Leave();
+        _etat = nouvelEtat;
+        _etat.Enter();
+    }
+
+   
 }

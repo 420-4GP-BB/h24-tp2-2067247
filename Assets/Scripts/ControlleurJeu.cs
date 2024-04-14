@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Vector3 = UnityEngine.Vector3;
 
@@ -20,6 +21,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text MsgBienvenue;
     [SerializeField] private Soleil soleil;
     [SerializeField] private GameObject panelMenu;
+    [SerializeField] private GameObject panelJeuPerdu;
     [SerializeField] private GameObject panelMenuMaison;
     [SerializeField] private GameObject panelApresOeuf;
     [SerializeField] private GameObject panelApresChoux;
@@ -36,16 +38,20 @@ public class ControlleurJeu : MonoBehaviour
 
 
     private bool menuActif = false;
+    private bool aManger = false;
     private int qtOr;
     private int qtOeuf;
     private int qtChoux = 0;
     private int qtGraines;
+    private ComportementJoueur comportementJoueur;
     int jour1 = 1;
     private float ValeurEnergie = 100;
-    TimeSpan time = new TimeSpan(8, 0, 0);
+    private TimeSpan periodeManger = new TimeSpan(0, 0, 0);
+    private TimeSpan time = new TimeSpan(8, 0, 0);
     // Start is called before the first frame update
     void Start()
     {
+        panelJeuPerdu.SetActive(false);
         panelApresChoux.SetActive(false);
         panelApresOeuf.SetActive(false);
         Poule.SetActive(false);
@@ -55,7 +61,7 @@ public class ControlleurJeu : MonoBehaviour
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
         MsgBienvenue.text= $"Bonjour {Parametres.Instance.Nom}, que puis-je faire pour toi aujourd'hui ?";
-
+        comportementJoueur = Joueur.GetComponent<ComportementJoueur>();
         IntialiserInventaire();
         EntreeMagasin.ZoneAtteinteHandler += ActiverMenu;
         EntreeMaison.ZoneAtteinteHandler += ActiverMenu;
@@ -78,7 +84,12 @@ public class ControlleurJeu : MonoBehaviour
                 time = time.Subtract(new TimeSpan(24, 0, 0));
             }
             jour.text = $"Jour {jour1}";
-
+            periodeManger = periodeManger.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
+            if (periodeManger.Hours > 12)
+            {
+                aManger = false;
+                periodeManger = new TimeSpan(0, 0, 0);
+            }
         }
         if (!menuActif)
         {
@@ -91,8 +102,8 @@ public class ControlleurJeu : MonoBehaviour
                 Time.timeScale = 1;
             }
         }
-        
 
+       
       
 
         //Les boutons sont cliquables seulement si le joueur a assez de ressources.
@@ -106,45 +117,59 @@ public class ControlleurJeu : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
            
-            GameObject objet =  Utilitaires.DeterminerClic("Oeuf");
+            GameObject oeuf =  Utilitaires.DeterminerClic("Oeuf");
             GameObject chouVide = Utilitaires.DeterminerClic("Chou");
             GameObject ChouPret = Utilitaires.DeterminerClic("ChouPret");
 
 
-            if (objet != null)
+            if (oeuf != null)
             {
-      
-               AquerirUnOeuf();
-               objet.SetActive(false);
+                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, oeuf, () => {
+                    AquerirUnOeuf();
+                    oeuf.SetActive(false);
+                }));
 
-              
+
+
+             
+               
             }
-            if (chouVide != null)
+            if (chouVide != null && VerifierChouVide(chouVide) && qtGraines > 0)
             {
-                if(VerifierChouVide(chouVide) && qtGraines > 0)
-
-                {
+                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, chouVide, () => {
                     GameObject child = chouVide.transform.Find("Petit").gameObject;
                     child.SetActive(true);
                     PlanterUnChoux();
-                }
-
-                
+                }));
             }
             if (ChouPret!= null)
             {
-                Debug.Log("le chou EST PRET");
+
+
+                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, ChouPret, () => {
+                    GameObject parentObject = ChouPret.transform.parent.gameObject;
+                    parentObject.SetActive(false);
+                    CueillirUnChoux();
+                }));
                 
-                GameObject parentObject = ChouPret.transform.parent.gameObject;
-                parentObject.SetActive(false);
-                CueillirUnChoux();
             }
         }
-            
-            
-            
-
+      
+         if (ValeurEnergie<1)
+        {
+            Time.timeScale = 0;
+            panelJeuPerdu.SetActive(true);
         }
+
+        if (ValeurEnergie < 21)
+        {
+            energie.color = Color.red;
+        }
+        if (ValeurEnergie > 20)
+        {
+            energie.color = Color.white;
+        }
+    }
     /// <summary>
     /// Achat de poule
     /// </summary>
@@ -196,6 +221,7 @@ public class ControlleurJeu : MonoBehaviour
     {
         Time.timeScale = 1;
         panelMenu.SetActive(false);
+        menuActif = false;
     }
     /// <summary>
     /// methode pour initialiser l'inventaire dapres les valeur stockées dans le singleton
@@ -354,6 +380,10 @@ public class ControlleurJeu : MonoBehaviour
             MangerUnChoux();
             panelApresChoux.SetActive(true);
         }
+        menuActif = true;
+
+        periodeManger = new TimeSpan(0, 0, 0);
+        aManger = true;
     }
     public void SortirMaison()
     {
@@ -363,7 +393,7 @@ public class ControlleurJeu : MonoBehaviour
     }
     public void okayManger()
     {
-        Time.timeScale = 1;
+       
         if (panelApresOeuf.activeSelf)
         {
             panelApresOeuf.SetActive(false);
@@ -373,6 +403,12 @@ public class ControlleurJeu : MonoBehaviour
             panelApresChoux.SetActive(false);
         }
        
+
+
+    }
+    public void SortirDuJeu()
+    {
+        SceneManager.LoadScene("Menu");
     }
 
 

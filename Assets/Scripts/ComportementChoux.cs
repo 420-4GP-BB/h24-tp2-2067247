@@ -41,7 +41,7 @@ public class ComportementChoux : MonoBehaviour
         {
             time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
 
-            if (time.TotalHours >= 48)
+            if (time.TotalHours >= 72)
             {
                 moyenChoux.SetActive(false);
                 pretChoux.SetActive(true);

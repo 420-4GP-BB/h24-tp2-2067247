@@ -56,6 +56,7 @@ public class ControlleurJeu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1;
         panelJeuPerdu.SetActive(false);
         panelDormir.SetActive(false);
         panelApresChoux.SetActive(false);
@@ -514,6 +515,7 @@ public class ControlleurJeu : MonoBehaviour
     public void SortirDuJeu()
     {
         SceneManager.LoadScene("Menu");
+       
     }
     /// <summary>
     /// fonction quand on click le bouton dormir

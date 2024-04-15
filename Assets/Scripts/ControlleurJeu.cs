@@ -33,6 +33,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private GameObject BoutonVendreChoux;
     [SerializeField] private GameObject BoutonManger;
     [SerializeField] private MagasinSujet EntreeMagasin;
+
     [SerializeField] private MaisonSujet EntreeMaison;
     [SerializeField] public GameObject Oeuf;
     [SerializeField] private GameObject Joueur;
@@ -617,5 +618,14 @@ public class ControlleurJeu : MonoBehaviour
         {
             return false;
         }
+    }
+
+
+    public void vendreChou()
+    {
+        qtChoux -= 1;
+        qtOr += 5;
+        nombreOr.text = qtOr.ToString();
+        nombreChoux.text = qtChoux.ToString();
     }
 }

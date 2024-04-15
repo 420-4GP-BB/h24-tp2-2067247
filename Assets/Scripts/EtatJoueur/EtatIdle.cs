@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EtatIdle : EtatJoueur
-{
+{/// <summary>
+/// constructeur de l'etta de base
+/// </summary>
+/// <param name="joueur"> script du joueur "Mathurin"</param>
+/// <param name="cible">Cible visée</param>
     public EtatIdle(ComportementJoueur joueur, GameObject cible) : base(joueur, cible)
     {
     }
@@ -12,9 +16,6 @@ public class EtatIdle : EtatJoueur
     {
         
         Animateur.SetBool("Walk", false);
-        Animateur.SetBool("Pickup", false);
-        Animateur.SetBool("Plant", false); 
-
        AgentMouvement.enabled = false;
         Controller.enabled = true;  
     }

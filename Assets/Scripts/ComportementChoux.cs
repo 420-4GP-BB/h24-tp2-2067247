@@ -22,7 +22,7 @@ public class ComportementChoux : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //si le choux est petit
         if (petitChoux.activeSelf)
         {
             time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
@@ -35,7 +35,7 @@ public class ComportementChoux : MonoBehaviour
             }
 
         }
-
+        //si le chou est moyen
 
         if (moyenChoux.activeSelf)
         {
@@ -48,18 +48,21 @@ public class ComportementChoux : MonoBehaviour
 
             }
         }
-
+        //reinitialisation du temps à zero
         if (pretChoux.activeSelf)
         {
             time = new TimeSpan(0, 0, 0);
 
         }
     }
+    /// <summary>
+    /// retourne si le choux et pret à etre cueilli.
+    /// </summary>
+    /// <returns></returns>
     public bool verifierPret()
     {
-        Debug.Log("Verification du chou : " + pretChoux.activeSelf);
+   
         return pretChoux.activeSelf;
-
 
     }
 }

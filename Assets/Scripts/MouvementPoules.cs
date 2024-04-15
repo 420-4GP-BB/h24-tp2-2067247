@@ -37,12 +37,13 @@ public class MouvementPoules : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+       
         if (!_agent.pathPending && _agent.remainingDistance < 0.2f)
         {
             _animator.SetBool("Walk", false);
             DirigerPoule();
         }
+        //décider si la poule va pondre à minuit
         if (controlleurJeu.GetTime().Hours == 00 && controlleurJeu.GetTime().Minutes >= 00 && decider == true)
         {
             decider = false;
@@ -50,12 +51,11 @@ public class MouvementPoules : MonoBehaviour
             if (nombre == 0)
             {
                 pondre = false;
-                Debug.Log("La poule ne pond pas");
+
             }
             else
             {
                 pondre = true;
-                Debug.Log("La poule va pondre");
             }
         }
         if (controlleurJeu.GetTime().Hours == 08 && controlleurJeu.GetTime().Minutes >= 00)
@@ -80,14 +80,15 @@ public class MouvementPoules : MonoBehaviour
         }
         if (controlleurJeu.GetTime().Hours == heurePonte && controlleurJeu.GetTime().Minutes >= minPonte && pondreOeuf)
         {
-            Debug.Log("Oeuf Pondu");
             controlleurJeu.PondreOeuf(transform.position);
             pondreOeuf = false;
         }
             
          
     }
-
+    /// <summary>
+    /// methode pour diriger la poule sur un point au hazard
+    /// </summary>
     private void DirigerPoule()
     {
 
@@ -98,6 +99,10 @@ public class MouvementPoules : MonoBehaviour
         _agent.destination = _pointsdestination[_indexPatrouille].position;
 
     }
+    /// <summary>
+    /// generer un heure de ponte random
+    /// </summary>
+    /// <returns></returns>
     private TimeSpan GenererHeureRandom()
     {
 

@@ -51,7 +51,7 @@ public class ControlleurJeu : MonoBehaviour
     private TimeSpan time = new TimeSpan(8, 0, 0);
     private bool endormi = false;
     private TimeSpan tempsDormir = new TimeSpan(0, 0, 0);
-    private const int TEMPS_SOMMEIL_NECCESSAIRE = 12;
+    private const int TEMPS_SOMMEIL_NECCESSAIRE = 10;
     private bool immortel = false;
     // Start is called before the first frame update
     void Start()
@@ -77,13 +77,14 @@ public class ControlleurJeu : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+    {//update de l amethode dormir si le joueur dort deja 
         if (endormi)
         {
             Dormir();
         }
+        //mise à jour de l,nergie
         UpdateEnergie();
-
+        //affichage du temps et prise en note de si le joueur a mangé dans les 12 dernieres heures
         if (soleil != null)
         {
             time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
@@ -101,6 +102,7 @@ public class ControlleurJeu : MonoBehaviour
                 periodeManger = new TimeSpan(0, 0, 0);
             }
         }
+        //acceleration avec tab
         if (!menuActif)
         {
             if (Input.GetKeyDown(KeyCode.Tab))
@@ -123,7 +125,7 @@ public class ControlleurJeu : MonoBehaviour
         BoutonVendreChoux.GetComponent<Button>().interactable = qtChoux >= 1;
         BoutonManger.GetComponent<Button>().interactable = VerifierManger();
 
-
+        // logique pour planter/ rammasser oeufs et choux quand l'utilisateur click sur un ibject
         if (Input.GetMouseButtonDown(0))
         {
 
@@ -161,13 +163,13 @@ public class ControlleurJeu : MonoBehaviour
 
             }
         }
-
+        // gestion du game over
         if (ValeurEnergie < 1)
         {
             Time.timeScale = 0;
             panelJeuPerdu.SetActive(true);
         }
-
+        // gestion de l acouleur de l'energie
         if (ValeurEnergie < 21)
         {
             energie.color = Color.red;
@@ -276,6 +278,9 @@ public class ControlleurJeu : MonoBehaviour
         qtOeuf += 1;
         nombreOeuf.text = qtOeuf.ToString();
     }
+    /// <summary>
+    /// Methode pour actualiser Valeur et l'energie lorsqu'on mange un oeuf
+    /// </summary>
     private void MangerUnOeuf()
     {
         ValeurEnergie += ConstantesJeu.GAIN_ENERGIE_MANGER_OEUF * 100;
@@ -296,6 +301,9 @@ public class ControlleurJeu : MonoBehaviour
         nombreChoux.text = qtChoux.ToString();
     }
 
+    /// <summary>
+    /// Methode pour actualiser Valeur et l'energie lorsqu'on mange un chou
+    /// </summary>
     private void MangerUnChoux()
     {
         ValeurEnergie += ConstantesJeu.GAIN_ENERGIE_MANGER_CHOU * 100;
@@ -316,7 +324,9 @@ public class ControlleurJeu : MonoBehaviour
         nombreGraines.text = qtGraines.ToString();
     }
 
-
+    /// <summary>
+    /// mettre à jour l'energie en utilisant CalculerEnergie(int Facteur) et depedemment de si c'est la nuit ou le jour pour le facteur
+    /// </summary>
     private void UpdateEnergie()
     {
         
@@ -339,7 +349,11 @@ public class ControlleurJeu : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// fonction pout calculer l'energie
+    /// </summary>
+    /// <param name="Facteur"> utile pour quand c'est la nuit et que je joueur perd deux fois plus dénergie</param>
+    /// <returns></returns>
     private float CalculerEnergie(int Facteur)
     {
         if (!immortel)
@@ -349,6 +363,10 @@ public class ControlleurJeu : MonoBehaviour
             if (endormi)
             {
                 return CalculEnergieSommeil();
+            }
+            else if(comportementJoueur.EnMarche)
+            {
+                return ConstantesJeu.COUT_MARCHER * (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift) ? 200 : 100) * Facteur * soleil.DeltaMinutesEcoulees;
             }
             else
             {
@@ -372,7 +390,10 @@ public class ControlleurJeu : MonoBehaviour
         }
     }
    
-
+    /// <summary>
+    /// calcul de l'energie acquise ou perdu durant le sommeil dépendemment de si le joueur a mangé
+    /// </summary>
+    /// <returns></returns>
     private float CalculEnergieSommeil()
     {
         if (aManger)
@@ -419,7 +440,7 @@ public class ControlleurJeu : MonoBehaviour
         return time;
     }
     /// <summary>
-    /// Pour verifier que les choux sont "inactifs", pour ne pas planter plus que un chou par endroit 
+    ///  verifier si les choux sont "inactifs", pour ne pas planter plus que un chou par endroit 
     /// </summary>
     /// <param name="chou">prend un gameobject chou</param>
     /// <returns></returns>
@@ -436,6 +457,8 @@ public class ControlleurJeu : MonoBehaviour
         // si non retourne true
         return true;
     }
+
+    //verification de si le joueur a de la nourriture à manger
     private bool VerifierManger()
     {
         if (qtOeuf > 0 || qtChoux > 0)
@@ -444,6 +467,9 @@ public class ControlleurJeu : MonoBehaviour
         }
         return false;
     }
+    /// <summary>
+    /// logique pour manger oeuf ou chou
+    /// </summary>
     public void Manger()
     {
         if (qtOeuf > 0)
@@ -461,12 +487,14 @@ public class ControlleurJeu : MonoBehaviour
         periodeManger = new TimeSpan(0, 0, 0);
         aManger = true;
     }
+    //bouton pour sortir du menu maison
     public void SortirMaison()
     {
         Time.timeScale = 1;
         panelMenuMaison.SetActive(false);
         menuActif = false;
     }
+    //bounton okay apres avoir manger
     public void okayManger()
     {
 
@@ -482,10 +510,14 @@ public class ControlleurJeu : MonoBehaviour
 
 
     }
+    //retourner au menu 
     public void SortirDuJeu()
     {
         SceneManager.LoadScene("Menu");
     }
+    /// <summary>
+    /// fonction quand on click le bouton dormir
+    /// </summary>
     public void Dormir()
     {
         panelDormir.SetActive(true);
@@ -503,7 +535,9 @@ public class ControlleurJeu : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Pour garder l'energie en dessous de 100;
+    /// </summary>
     public void corrigerEnergie() {
         if (ValeurEnergie > 100)
         {
@@ -512,6 +546,9 @@ public class ControlleurJeu : MonoBehaviour
         }
         
     }
+    /// <summary>
+    /// codes de triche
+    /// </summary>
 
     public void Tricher()
     {
@@ -559,6 +596,24 @@ public class ControlleurJeu : MonoBehaviour
                energie.text= ValeurEnergie + " %";
             }
            
+        }
+
+        
+    }
+    /// <summary>
+    /// fonction pour determiner si l'energie est suffisante pour pouvoir courrir
+    /// </summary>
+    /// <returns></returns>
+    public bool PeutCourir()
+    {
+        if (ValeurEnergie > 20)
+        {
+            return true;
+
+        }
+        else
+        {
+            return false;
         }
     }
 }

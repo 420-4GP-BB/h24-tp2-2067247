@@ -5,7 +5,9 @@ using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 public class EtatMarche : EtatJoueur
-{
+{/// <summary>
+/// Action pour determiner si la cible est atteinte, J,ai utilisé chat gpt pour cet element
+/// </summary>
     private Action cibleAtteinte;
     public EtatMarche(ComportementJoueur joueur, GameObject cible, Action atteinte) : base(joueur, cible)
     {
@@ -23,25 +25,25 @@ public class EtatMarche : EtatJoueur
 
     public override void Handle()
     {
-        
-        string tagCible = Cible.tag;
+
         float Proximite = DeterminerProximite(Cible.tag);
         if (!AgentMouvement.pathPending && AgentMouvement.remainingDistance < Proximite)
         {
             Animateur.SetBool("Walk", false);  
             DetermineActionparTag(Cible.tag);
-
         }
     }
 
-
+    /// <summary>
+    /// Déterminer l'action d'après le tag de l'objet à proximité
+    /// </summary>
+    /// <param name="tag"></param>
     private void DetermineActionparTag(string tag)
     {
         switch (tag)
         {
             case "Oeuf":
             case "ChouPret":
-                Debug.Log("Le mode pick up est activé");
                 cibleAtteinte?.Invoke();
                 Joueur.ChangerEtat(new EtatPickUp(Joueur, Cible));
                 break;
@@ -51,7 +53,6 @@ public class EtatMarche : EtatJoueur
                 Joueur.ChangerEtat(new EtatPlant(Joueur, Cible));
                 break;
             default:
-                Debug.LogError("Error: Tag non-pris en cimpte: " + tag);
                 Joueur.ChangerEtat(new EtatIdle(Joueur, null));  
                 break;
         }
@@ -63,6 +64,11 @@ public class EtatMarche : EtatJoueur
         Controller.enabled = true;
         Joueur.transform.rotation= Quaternion.Euler(0,Joueur.transform.rotation.eulerAngles.y, 0);
     }
+    /// <summary>
+    /// Détermine la proximité d'apres la nature de l'objet
+    /// </summary>
+    /// <param name="tag"> tag de l'objet</param>
+    /// <returns></returns>
     private float DeterminerProximite(string tag)
     {
         switch (tag)
@@ -70,14 +76,17 @@ public class EtatMarche : EtatJoueur
             case "Oeuf":
                 return 0.2f;
             case "ChouPret":
-                return 2f;
+                return 1.5f;
             case "Chou":
                 return 0.2f; 
             default:
                 return 0.2f; 
         }
     }
-
+    /// <summary>
+    ///  
+    /// </summary>
+    /// <returns>un bool pour decider si le input est permis</returns>
     public override bool AllowInput()
     {
         return false;

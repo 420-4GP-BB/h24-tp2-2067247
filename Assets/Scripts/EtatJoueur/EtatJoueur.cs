@@ -34,6 +34,11 @@ public abstract class EtatJoueur
         set;
         get;
     }
+    /// <summary>
+    /// constructeur
+    /// </summary>
+    /// <param name="joueur"> script joueur affecté par l'état</param>
+    /// <param name="cible"> objet à rammasser ou planter</param>
     public EtatJoueur(ComportementJoueur joueur, GameObject cible)
     {
         Joueur = joueur;
@@ -44,11 +49,15 @@ public abstract class EtatJoueur
 
     }
   
-    
+    /// <summary>
+    ///     retourne 
+    /// </summary>
+    /// <returns>un bool pour decider si le input est permis</returns>
     public virtual bool AllowInput()
     {
         return true;  
     }
+    // retourne le nom de l'etat en cours
     public abstract string getName();
     public abstract void Enter();
     public abstract void Handle();

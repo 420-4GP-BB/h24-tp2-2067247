@@ -13,24 +13,27 @@ public class EtatPlant : EtatJoueur
 
         AgentMouvement.enabled = false;
         Controller.enabled = false;
-        Animateur.SetBool("Plant", true);
+        Animateur.SetTrigger("PlantTrigger");
     }
 
     public override void Handle()
     {
         if (Animateur.GetCurrentAnimatorStateInfo(0).IsName("Planter") &&
-        Animateur.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.3f)
+        Animateur.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.6f)
         {
             Joueur.ChangerEtat(new EtatIdle(Joueur, null));
         }
-        Joueur.ChangerEtat(new EtatIdle(Joueur, null));
+        else
+        if (Animateur.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+        {
+            Joueur.ChangerEtat(new EtatIdle(Joueur, null));
+        }
     }
 
     public override void Leave()
     {
         AgentMouvement.enabled = false;
         Controller.enabled = true;
-        Animateur.SetBool("Plant", false);
     }
     public override bool AllowInput()
     {

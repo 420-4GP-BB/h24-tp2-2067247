@@ -9,26 +9,31 @@ public class ComportementJoueur : MonoBehaviour
     private Animator _animator;
     private CharacterController _controller;
     private Transform _transform;
-    private NavMeshAgent _agent;
-    private float vitesse = 7.0f; 
+    private float vitesse = 7.0f;
     private float rotationSpeed = 120.0f;
     [SerializeField] private Transform magasin;
     [SerializeField] private Transform maison;
+    [SerializeField] private ControlleurJeu controlleurJeu;
+
+    public bool EnMarche
+    {
+        private set;
+        get;
+    }
     public EtatJoueur _etat
     {
         private set;
         get;
     }
-    
+
 
     void Start()
     {
-        _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _controller = GetComponent<CharacterController>();
         _transform = GetComponent<Transform>();
         ChangerEtat(new EtatIdle(this, null));
-        
+
     }
 
 
@@ -36,12 +41,15 @@ public class ComportementJoueur : MonoBehaviour
     {
         _etat.Handle();
         GererInput();
-       
-       
+
+
     }
-    void GererInput()
+    /// <summary>
+    /// methode pour gerer les inputs si ils sont permis
+    /// </summary>
+    private void GererInput()
     {
-        if (!AutoriserInput()) return;  // Prevent input if the current state disallows it
+        if (!AutoriserInput()) return;  // empeche le input si l'etat ne permet pas 
 
         // gerer rotation
         float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
@@ -49,21 +57,33 @@ public class ComportementJoueur : MonoBehaviour
 
         // gerer movement
         float vertical = Input.GetAxis("Vertical");
+        float vitesseMouvement;
         if (vertical != 0)
         {
-            float vitesseMouvement = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? vitesse * 2 : vitesse;
-            // Player has input for movement, thus move the character
+            //verification du pourcentage d'energie 
+            if (controlleurJeu.PeutCourir())
+            {
+
+                //la vitesse varie dépendamment de l'etat du shif button
+                vitesseMouvement = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? vitesse * 2 : vitesse;
+
+            }
+            else
+            {
+                vitesseMouvement = vitesse/2;
+
+            }
+
             Vector3 move = transform.forward * vertical * vitesseMouvement;
             _controller.SimpleMove(move);
-
-            
+            //J'accede a l'animateur directement pour ne pas causer de confusion avec l'agent nav mesh
             _animator.SetBool("Walk", true);
-            
+            EnMarche = true;
         }
         else
         {
-          
             _animator.SetBool("Walk", false);
+            EnMarche = false;
         }
 
         // Cheat codes
@@ -76,12 +96,19 @@ public class ComportementJoueur : MonoBehaviour
             _transform.position = maison.position;
         }
     }
-   private bool AutoriserInput()
+    /// <summary>
+    /// methode pour verifier si l'input est autorise
+    /// </summary>
+    /// <returns> un boolean</returns>
+    private bool AutoriserInput()
     {
-        
+
         return _etat?.AllowInput() ?? true;
     }
-
+    /// <summary>
+    /// methode pour naviguer entre les etats 
+    /// </summary>
+    /// <param name="nouvelEtat">Nouvel etat que l'on veut acceder</param>
     public void ChangerEtat(EtatJoueur nouvelEtat)
     {
         _etat?.Leave();
@@ -89,5 +116,4 @@ public class ComportementJoueur : MonoBehaviour
         _etat.Enter();
     }
 
-   
 }

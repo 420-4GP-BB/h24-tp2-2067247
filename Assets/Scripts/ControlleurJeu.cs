@@ -620,7 +620,9 @@ public class ControlleurJeu : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// methode pour vendre les choux et mettre a jour les valeures
+    /// </summary>
     public void vendreChou()
     {
         qtChoux -= 1;

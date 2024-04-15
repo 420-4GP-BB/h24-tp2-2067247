@@ -25,7 +25,8 @@ public class EtatMarche : EtatJoueur
     {
         
         string tagCible = Cible.tag;
-        if (!AgentMouvement.pathPending && AgentMouvement.remainingDistance < 0.2f)
+        float Proximite = DeterminerProximite(Cible.tag);
+        if (!AgentMouvement.pathPending && AgentMouvement.remainingDistance < Proximite)
         {
             Animateur.SetBool("Walk", false);  
             DetermineActionparTag(Cible.tag);
@@ -62,9 +63,28 @@ public class EtatMarche : EtatJoueur
         Controller.enabled = true;
         Joueur.transform.rotation= Quaternion.Euler(0,Joueur.transform.rotation.eulerAngles.y, 0);
     }
+    private float DeterminerProximite(string tag)
+    {
+        switch (tag)
+        {
+            case "Oeuf":
+                return 0.2f;
+            case "ChouPret":
+                return 2f;
+            case "Chou":
+                return 0.2f; 
+            default:
+                return 0.2f; 
+        }
+    }
 
     public override bool AllowInput()
     {
         return false;
+    }
+
+    public override string getName()
+    {
+        return "Marche";
     }
 }

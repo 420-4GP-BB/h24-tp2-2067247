@@ -49,7 +49,7 @@ public abstract class EtatJoueur
     {
         return true;  
     }
-
+    public abstract string getName();
     public abstract void Enter();
     public abstract void Handle();
     public abstract void Leave();

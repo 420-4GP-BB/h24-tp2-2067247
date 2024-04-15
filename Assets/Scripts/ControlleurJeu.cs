@@ -21,6 +21,7 @@ public class ControlleurJeu : MonoBehaviour
     [SerializeField] private TMP_Text MsgBienvenue;
     [SerializeField] private Soleil soleil;
     [SerializeField] private GameObject panelMenu;
+    [SerializeField] private GameObject panelDormir;
     [SerializeField] private GameObject panelJeuPerdu;
     [SerializeField] private GameObject panelMenuMaison;
     [SerializeField] private GameObject panelApresOeuf;
@@ -48,10 +49,15 @@ public class ControlleurJeu : MonoBehaviour
     private float ValeurEnergie = 100;
     private TimeSpan periodeManger = new TimeSpan(0, 0, 0);
     private TimeSpan time = new TimeSpan(8, 0, 0);
+    private bool endormi = false;
+    private TimeSpan tempsDormir = new TimeSpan(0, 0, 0);
+    private const int TEMPS_SOMMEIL_NECCESSAIRE = 12;
+    private bool immortel = false;
     // Start is called before the first frame update
     void Start()
     {
         panelJeuPerdu.SetActive(false);
+        panelDormir.SetActive(false);
         panelApresChoux.SetActive(false);
         panelApresOeuf.SetActive(false);
         Poule.SetActive(false);
@@ -60,7 +66,7 @@ public class ControlleurJeu : MonoBehaviour
         panelMenuMaison.SetActive(false);
         energie.text = ValeurEnergie + " %";
         nomJoueur.text = Parametres.Instance.Nom;
-        MsgBienvenue.text= $"Bonjour {Parametres.Instance.Nom}, que puis-je faire pour toi aujourd'hui ?";
+        MsgBienvenue.text = $"Bonjour {Parametres.Instance.Nom}, que puis-je faire pour toi aujourd'hui ?";
         comportementJoueur = Joueur.GetComponent<ComportementJoueur>();
         IntialiserInventaire();
         EntreeMagasin.ZoneAtteinteHandler += ActiverMenu;
@@ -72,8 +78,12 @@ public class ControlleurJeu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ValeurEnergie -= ConstantesJeu.COUT_IMMOBILE*100*soleil.DeltaMinutesEcoulees;
-        energie.text = ((int)ValeurEnergie) + " %";
+        if (endormi)
+        {
+            Dormir();
+        }
+        UpdateEnergie();
+
         if (soleil != null)
         {
             time = time.Add(TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees));
@@ -103,8 +113,8 @@ public class ControlleurJeu : MonoBehaviour
             }
         }
 
-       
-      
+        Tricher();
+
 
         //Les boutons sont cliquables seulement si le joueur a assez de ressources.
         BoutonAcheterOeufs.GetComponent<Button>().interactable = qtOr >= 25;
@@ -116,46 +126,43 @@ public class ControlleurJeu : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-           
-            GameObject oeuf =  Utilitaires.DeterminerClic("Oeuf");
+
+            GameObject oeuf = Utilitaires.DeterminerClic("Oeuf");
             GameObject chouVide = Utilitaires.DeterminerClic("Chou");
             GameObject ChouPret = Utilitaires.DeterminerClic("ChouPret");
-
+            //seulement l'animation pour ramasser des oeufs fonctionne
 
             if (oeuf != null)
             {
-                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, oeuf, () => {
+                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, oeuf, () =>
+                {
                     AquerirUnOeuf();
                     oeuf.SetActive(false);
                 }));
 
-
-
-             
-               
             }
             if (chouVide != null && VerifierChouVide(chouVide) && qtGraines > 0)
             {
-                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, chouVide, () => {
+                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, chouVide, () =>
+                {
                     GameObject child = chouVide.transform.Find("Petit").gameObject;
-                    child.SetActive(true);
                     PlanterUnChoux();
+                    child.SetActive(true);
                 }));
             }
-            if (ChouPret!= null)
+            if (ChouPret != null)
             {
-
-
-                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, ChouPret, () => {
+                comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, ChouPret, () =>
+                {
                     GameObject parentObject = ChouPret.transform.parent.gameObject;
                     parentObject.SetActive(false);
                     CueillirUnChoux();
                 }));
-                
+
             }
         }
-      
-         if (ValeurEnergie<1)
+
+        if (ValeurEnergie < 1)
         {
             Time.timeScale = 0;
             panelJeuPerdu.SetActive(true);
@@ -186,7 +193,7 @@ public class ControlleurJeu : MonoBehaviour
     //ponte des oeuf
     public void PondreOeuf(Vector3 position)
     {
-       
+
         if (Oeuf.activeSelf)
         {
             GameObject.Instantiate(Oeuf);
@@ -276,7 +283,7 @@ public class ControlleurJeu : MonoBehaviour
         {
             ValeurEnergie = 100;
         }
-        
+
         qtOeuf -= 1;
         nombreOeuf.text = qtOeuf.ToString();
     }
@@ -308,7 +315,75 @@ public class ControlleurJeu : MonoBehaviour
         qtGraines -= 1;
         nombreGraines.text = qtGraines.ToString();
     }
-    
+
+
+    private void UpdateEnergie()
+    {
+        
+        if (soleil.EstNuit)
+        {
+            float energieCout = CalculerEnergie(2);
+            ValeurEnergie -= energieCout;
+            energie.text = ((int)ValeurEnergie) + " %";
+            corrigerEnergie();
+        }
+        else
+        {
+            float energieCout = CalculerEnergie(1);
+            ValeurEnergie -= energieCout;
+            energie.text = ((int)ValeurEnergie) + " %";
+            corrigerEnergie();
+        }
+
+       
+    }
+
+
+
+    private float CalculerEnergie(int Facteur)
+    {
+        if (!immortel)
+        {
+
+
+            if (endormi)
+            {
+                return CalculEnergieSommeil();
+            }
+            else
+            {
+                switch (comportementJoueur._etat.getName())
+                {
+                    case "Marche":
+                        return ConstantesJeu.COUT_MARCHER * (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift) ? 200 : 100) * Facteur * soleil.DeltaMinutesEcoulees;
+                    case "PickUp":
+                        return ConstantesJeu.COUT_CUEILLIR * 100 * Facteur * soleil.DeltaMinutesEcoulees;
+                    case "Plante":
+                        return ConstantesJeu.COUT_PLANTER * 100 * Facteur * soleil.DeltaMinutesEcoulees;
+                    default:
+                        return ConstantesJeu.COUT_IMMOBILE * 100 * Facteur * soleil.DeltaMinutesEcoulees;
+                }
+            }
+
+        }
+        else
+        {
+            return 0f;
+        }
+    }
+   
+
+    private float CalculEnergieSommeil()
+    {
+        if (aManger)
+        {
+            return ConstantesJeu.GAIN_ENERGIE_SOMMEIL * 100 * soleil.DeltaMinutesEcoulees;
+        }
+        else
+        {
+            return ConstantesJeu.COUT_IMMOBILE * 100 * soleil.DeltaMinutesEcoulees;
+        }
+    }
 
     /// <summary>
     /// Activer le menu du magasin
@@ -317,7 +392,7 @@ public class ControlleurJeu : MonoBehaviour
     /// <param name="e"></param>
     public void ActiverMenu(object sender, EventArgs e)
     {
-        if (sender == EntreeMagasin )
+        if (sender == EntreeMagasin)
         {
             Time.timeScale = 0;
             panelMenu.SetActive(true);
@@ -339,7 +414,7 @@ public class ControlleurJeu : MonoBehaviour
     /// donne le temps actuel pour les autres classes
     /// </summary>
     /// <returns> return the temps de heu</returns>
-    public  TimeSpan GetTime()
+    public TimeSpan GetTime()
     {
         return time;
     }
@@ -363,7 +438,7 @@ public class ControlleurJeu : MonoBehaviour
     }
     private bool VerifierManger()
     {
-        if (qtOeuf>0 || qtChoux > 0)
+        if (qtOeuf > 0 || qtChoux > 0)
         {
             return true;
         }
@@ -375,8 +450,9 @@ public class ControlleurJeu : MonoBehaviour
         {
             MangerUnOeuf();
             panelApresOeuf.SetActive(true);
-        }else if(qtChoux>0)
-            {
+        }
+        else if (qtChoux > 0)
+        {
             MangerUnChoux();
             panelApresChoux.SetActive(true);
         }
@@ -393,7 +469,7 @@ public class ControlleurJeu : MonoBehaviour
     }
     public void okayManger()
     {
-       
+
         if (panelApresOeuf.activeSelf)
         {
             panelApresOeuf.SetActive(false);
@@ -402,7 +478,7 @@ public class ControlleurJeu : MonoBehaviour
         {
             panelApresChoux.SetActive(false);
         }
-       
+
 
 
     }
@@ -410,7 +486,79 @@ public class ControlleurJeu : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
+    public void Dormir()
+    {
+        panelDormir.SetActive(true);
+        endormi = true;
+        Time.timeScale = 90;
+        tempsDormir += TimeSpan.FromMinutes(soleil.DeltaMinutesEcoulees);
+        if (tempsDormir.TotalHours >= TEMPS_SOMMEIL_NECCESSAIRE)
+        {
+           
+            Time.timeScale = 1;
+            endormi = false;
+            tempsDormir = new TimeSpan(0, 0, 0);
+            panelDormir.SetActive(false);
+            SortirMaison();
+        }
+    }
 
 
+    public void corrigerEnergie() {
+        if (ValeurEnergie > 100)
+        {
+            ValeurEnergie = 100;
+            energie.text = ((int)ValeurEnergie) + " %";
+        }
+        
+    }
 
+    public void Tricher()
+    {
+        if (Input.GetKeyDown(KeyCode.E)){
+            qtOeuf += 100;
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            qtOr += 100;
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            qtChoux += 10;
+           
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            qtGraines += 10;
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            qtOeuf = 0;
+            qtOr = 0;
+            qtChoux = 0;
+            qtGraines = 0;
+
+        }
+
+        nombreOr.text = qtOr.ToString();
+        nombreOeuf.text = qtOeuf.ToString();
+        nombreGraines.text = qtGraines.ToString();
+        nombreChoux.text = qtChoux.ToString();
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            if (immortel)
+            {
+                immortel = false;
+            }
+            else
+            {
+                immortel = true;
+                ValeurEnergie = 100;
+               energie.text= ValeurEnergie + " %";
+            }
+           
+        }
+    }
 }

@@ -14,7 +14,11 @@ public class ComportementJoueur : MonoBehaviour
     private float rotationSpeed = 120.0f;
     [SerializeField] private Transform magasin;
     [SerializeField] private Transform maison;
-    private EtatJoueur _etat;
+    public EtatJoueur _etat
+    {
+        private set;
+        get;
+    }
     
 
     void Start()
@@ -47,8 +51,9 @@ public class ComportementJoueur : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
         if (vertical != 0)
         {
+            float vitesseMouvement = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? vitesse * 2 : vitesse;
             // Player has input for movement, thus move the character
-            Vector3 move = transform.forward * vertical * vitesse;
+            Vector3 move = transform.forward * vertical * vitesseMouvement;
             _controller.SimpleMove(move);
 
             

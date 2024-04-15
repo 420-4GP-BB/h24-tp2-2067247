@@ -23,6 +23,7 @@ public class EtatPlant : EtatJoueur
         {
             Joueur.ChangerEtat(new EtatIdle(Joueur, null));
         }
+        Joueur.ChangerEtat(new EtatIdle(Joueur, null));
     }
 
     public override void Leave()
@@ -34,5 +35,10 @@ public class EtatPlant : EtatJoueur
     public override bool AllowInput()
     {
         return false;
+    }
+
+    public override string getName()
+    {
+        return "Plante";
     }
 }

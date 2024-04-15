@@ -19,10 +19,11 @@ public class EtatPickUp : EtatJoueur
     public override void Handle()
     {
         if (Animateur.GetCurrentAnimatorStateInfo(0).IsName("PickingUp") &&
-        Animateur.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.3f)
+        Animateur.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
         {
             Joueur.ChangerEtat(new EtatIdle(Joueur, null));
         }
+       
     }
 
     public override void Leave()
@@ -34,5 +35,9 @@ public class EtatPickUp : EtatJoueur
     public override bool AllowInput()
     {
         return false;
+    }
+    public override string getName()
+    {
+        return "PickUp";
     }
 }

@@ -33,4 +33,9 @@ public class EtatIdle : EtatJoueur
         
         return true;  
     }
+
+    public override string getName()
+    {
+        return "Idle";
+    }
 }

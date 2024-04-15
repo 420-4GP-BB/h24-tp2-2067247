@@ -64,7 +64,7 @@ public class ComportementJoueur : MonoBehaviour
             if (controlleurJeu.PeutCourir())
             {
 
-                //la vitesse varie dépendamment de l'etat du shif button
+                //la vitesse varie dépendamment de l'etat du shif button(j'ai utilisé chat gpt pour le formater de cette maniere)
                 vitesseMouvement = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? vitesse * 2 : vitesse;
 
             }

@@ -28,7 +28,7 @@ public class EtatIdle : EtatJoueur
     {
         
     }
-
+    // le seul etat qui a permet le input
     public override bool AllowInput()
     {
         

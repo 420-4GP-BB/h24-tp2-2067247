@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class EtatMarche : EtatJoueur
 {/// <summary>
-/// Action pour determiner si la cible est atteinte, J,ai utilisé chat gpt pour cet element
+/// Action pour determiner si la cible est atteinte, J,ai utilisé chat gpt pour cet element ici et dans DetermineActionparTag
 /// </summary>
     private Action cibleAtteinte;
     public EtatMarche(ComportementJoueur joueur, GameObject cible, Action atteinte) : base(joueur, cible)

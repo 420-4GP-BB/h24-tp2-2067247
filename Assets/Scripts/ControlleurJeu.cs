@@ -133,8 +133,8 @@ public class ControlleurJeu : MonoBehaviour
             GameObject oeuf = Utilitaires.DeterminerClic("Oeuf");
             GameObject chouVide = Utilitaires.DeterminerClic("Chou");
             GameObject ChouPret = Utilitaires.DeterminerClic("ChouPret");
-            //seulement l'animation pour ramasser des oeufs fonctionne
 
+            //J'ai utilisé chatgpt pour le "() =>", pour massurer d'ettre sorti de l'etat avant de disactiver le gameobject
             if (oeuf != null)
             {
                 comportementJoueur.ChangerEtat(new EtatMarche(comportementJoueur, oeuf, () =>

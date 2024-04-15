@@ -386,7 +386,7 @@ public class ControlleurJeu : MonoBehaviour
 
         }
         else
-        {
+        {// si immortel, il ne pperd pas d'énergie
             return 0f;
         }
     }
